@@ -329,18 +329,7 @@ int InitSPI()
 
 #if !defined(KERNEL_MODULE) && (!defined(KERNEL_MODULE_CLIENT) || defined(KERNEL_MODULE_CLIENT_DRIVES))
   printf("Initializing display\n");
-  InitSPIDisplay();
 
-#ifdef USE_SPI_THREAD
-  // Create a dedicated thread to feed the SPI bus. While this is fast, it consumes a lot of CPU. It would be best to replace
-  // this thread with a kernel module that processes the created SPI task queue using interrupts. (while juggling the GPIO D/C line as well)
-  printf("Creating SPI task thread\n");
-  int rc = pthread_create(&spiThread, NULL, spi_thread, NULL); // After creating the thread, it is assumed to have ownership of the SPI bus, so no SPI chat on the main thread after this.
-  if (rc != 0) FATAL_ERROR("Failed to create SPI thread!");
-#else
-  // We will be running SPI tasks continuously from the main thread, so keep SPI Transfer Active throughout the lifetime of the driver.
-  BEGIN_SPI_COMMUNICATION();
-#endif
 
 #endif
 

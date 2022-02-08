@@ -103,6 +103,7 @@ void DeinitSPIDisplay()
 }
 
 int main() {
+    InitSPI();
     InitILI9486();
     std::cout << "Hello, World!" << std::endl;
     return 0;
