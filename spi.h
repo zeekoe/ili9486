@@ -5,10 +5,6 @@
 #include <linux/futex.h>
 #include <unistd.h>
 #include "display.h"
-//#include "../fbcp-ili9341/display.h"
-//#include "../fbcp-ili9341/tick.h"
-//#include "../fbcp-ili9341/dma.h"
-//#include "../fbcp-ili9341/display.h"
 
 #define BCM2835_GPIO_BASE                    0x200000   // Address to GPIO register file
 #define BCM2835_SPI0_BASE                    0x204000   // Address to SPI0 register file

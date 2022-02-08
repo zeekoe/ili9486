@@ -6,12 +6,10 @@
 #include <bcm_host.h> // bcm_host_get_peripheral_address, bcm_host_get_peripheral_size, bcm_host_get_sdram_address
 #endif
 
-#include "../fbcp-ili9341/config.h"
+#include "config.h"
 #include "spi.h"
-#include "../fbcp-ili9341/util.h"
-#include "../fbcp-ili9341/dma.h"
-#include "../fbcp-ili9341/mailbox.h"
-#include "../fbcp-ili9341/mem_alloc.h"
+#include "util.h"
+#include "mem_alloc.h"
 
 // Uncomment this to print out all bytes sent to the SPI bus
 // #define DEBUG_SPI_BUS_WRITES

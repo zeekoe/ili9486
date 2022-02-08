@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 file(GLOB sourceFiles *.cpp)
 
-add_executable(ili9486 main.cpp display.cpp spi.cpp)
+add_executable(ili9486 main.cpp display.cpp spi.cpp mem_alloc.cpp)
 
 target_link_libraries(ili9486 bcm_host)
