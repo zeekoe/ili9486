@@ -147,15 +147,13 @@ void DoneTask(SPITask *task) // Frees the first SPI task from the queue, called 
   __sync_synchronize();
 }
 
-extern volatile bool programRunning;
-
 void ExecuteSPITasks()
 {
 #ifndef USE_DMA_TRANSFERS
   BEGIN_SPI_COMMUNICATION();
 #endif
   {
-    while(programRunning && spiTaskMemory->queueTail != spiTaskMemory->queueHead)
+    while(spiTaskMemory->queueTail != spiTaskMemory->queueHead)
     {
       SPITask *task = GetTask();
       if (task)
