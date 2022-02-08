@@ -3,7 +3,6 @@
 #include <syslog.h> // syslog
 #include <fcntl.h> // open, O_RDWR, O_SYNC
 #include <sys/mman.h> // mmap, munmap
-#include <pthread.h> // pthread_create
 #include <bcm_host.h> // bcm_host_get_peripheral_address, bcm_host_get_peripheral_size, bcm_host_get_sdram_address
 #endif
 
@@ -71,29 +70,6 @@ void DumpSPICS(uint32_t reg)
   printf("SPI0 DLEN: %u\n", spi->dlen);
   printf("SPI0 CE0 register: %d\n", GET_GPIO(GPIO_SPI0_CE0) ? 1 : 0);
 }
-
-#ifdef RUN_WITH_REALTIME_THREAD_PRIORITY
-
-#include <pthread.h>
-#include <sched.h>
-
-void SetRealtimeThreadPriority()
-{
-  sched_param params;
-  params.sched_priority = sched_get_priority_max(SCHED_FIFO);
-
-  int failed = pthread_setschedparam(pthread_self(), SCHED_FIFO, &params);
-  if (failed) FATAL_ERROR("pthread_setschedparam() failed!");
-
-  int policy = 0;
-  failed = pthread_getschedparam(pthread_self(), &policy, &params);
-  if (failed) FATAL_ERROR("pthread_getschedparam() failed!");
-
-  if (policy != SCHED_FIFO) FATAL_ERROR("Failed to set realtime thread policy!");
-  printf("Set fbcp-ili9341 thread scheduling priority to maximum (%d)\n", sched_get_priority_max(SCHED_FIFO));
-}
-
-#endif
 
 // Errata to BCM2835 behavior: documentation states that the SPI0 DLEN register is only used for DMA. However, even when DMA is not being utilized, setting it from
 // a value != 0 or 1 gets rid of an excess idle clock cycle that is present when transmitting each byte. (by default in Polled SPI Mode each 8 bits transfer in 9 clocks)
@@ -195,40 +171,6 @@ void ExecuteSPITasks()
   END_SPI_COMMUNICATION();
 #endif
 }
-
-#if !defined(KERNEL_MODULE) && defined(USE_SPI_THREAD)
-pthread_t spiThread;
-
-// A worker thread that keeps the SPI bus filled at all times
-void *spi_thread(void *unused)
-{
-#ifdef RUN_WITH_REALTIME_THREAD_PRIORITY
-  SetRealtimeThreadPriority();
-#endif
-  while(programRunning)
-  {
-    if (spiTaskMemory->queueTail != spiTaskMemory->queueHead)
-    {
-      ExecuteSPITasks();
-    }
-    else
-    {
-#ifdef STATISTICS
-      uint64_t t0 = tick();
-      spiThreadSleepStartTime = t0;
-      __atomic_store_n(&spiThreadSleeping, 1, __ATOMIC_RELAXED);
-#endif
-      if (programRunning) syscall(SYS_futex, &spiTaskMemory->queueTail, FUTEX_WAIT, spiTaskMemory->queueHead, 0, 0, 0); // Start sleeping until we get new tasks
-#ifdef STATISTICS
-      __atomic_store_n(&spiThreadSleeping, 0, __ATOMIC_RELAXED);
-      uint64_t t1 = tick();
-      __sync_fetch_and_add(&spiThreadIdleUsecs, t1-t0);
-#endif
-    }
-  }
-  pthread_exit(0);
-}
-#endif
 
 int InitSPI()
 {
@@ -339,10 +281,6 @@ int InitSPI()
 
 void DeinitSPI()
 {
-#ifdef USE_SPI_THREAD
-  pthread_join(spiThread, NULL);
-  spiThread = (pthread_t)0;
-#endif
   DeinitSPIDisplay();
 #ifdef USE_DMA_TRANSFERS
   DeinitDMA();
