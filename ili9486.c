@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 #include "armbianio.h"
 
 #define DISPLAY_SET_CURSOR_X 0x2A
@@ -32,7 +34,7 @@
 #define END_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 1);
 
 int handle;
-
+static struct spi_ioc_transfer xfer;
 
 void SPI_TRANSFER(char cmd, int num_args, ...) {
     va_list ap;
@@ -64,7 +66,6 @@ void SPI_TRANSFER(char cmd, int num_args, ...) {
     AIOWriteSPI(handle, origStr, num_args);
 
 }
-
 
 void InitILI9486() {
 //    printf("GPIO_SPI0_CE0\n");
@@ -154,16 +155,26 @@ void InitILI9486() {
                          0, (DISPLAY_HEIGHT - 1) & 0xFF);
 
             unsigned char cmdBuf[2] = {0, DISPLAY_WRITE_PIXELS};
-            unsigned char *cmdBufPtr = cmdBuf;
 
-            unsigned char dataBuf[100] = {0,0,128,128,255,255,0,255,255,0,128,255,255,128};
+            unsigned char dataBuf[1000];
+            for(int i = 0; i < 1000; i++) {
+                dataBuf[i] = (unsigned char) i;
+            }
+            unsigned char *dataBufPtr = dataBuf;
 
             for (int i = 0; i < DISPLAY_WIDTH; ++i) {
                 AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
                 AIOWriteSPI(handle, cmdBuf, 2);
                 AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
 
-                AIOWriteSPI(handle, dataBuf, 13);
+                xfer.rx_buf = 0;
+                xfer.tx_buf = (unsigned long) dataBufPtr;
+                xfer.len = 320;
+                ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
+
+                if (i % 10 == 0) {
+                    dataBufPtr++;
+                }
             }
         }
         SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
