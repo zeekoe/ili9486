@@ -149,7 +149,7 @@ void InitILI9486() {
         SPI_TRANSFER(0x13/*Normal Display Mode ON*/, 0);
 
         unsigned long dataBuf[1000];
-        for(int i = 0; i < 1000; i++) {
+        for(int i = 0; i < 16384; i += 52) {
             dataBuf[i] = (unsigned long) i;
         }
         unsigned long *dataBufPtr = dataBuf;
