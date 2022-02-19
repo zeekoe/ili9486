@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
 project(ili9486)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 99)
 
-file(GLOB sourceFiles *.cpp)
+file(GLOB sourceFiles *.c)
 
-add_executable(ili9486 main.cpp display.cpp spi.cpp mem_alloc.cpp)
+add_executable(ili9486 main.c ili9486.c armbianio.c)
 
 target_link_libraries(ili9486 bcm_host)
