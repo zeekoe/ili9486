@@ -161,19 +161,22 @@ void InitILI9486() {
                 dataBuf[i] = (unsigned char) i;
             }
             unsigned char *dataBufPtr = dataBuf;
+            xfer.rx_buf = 0;
+            xfer.tx_buf = (unsigned long) dataBufPtr;
+            xfer.len = 320 * 2;
 
             for (int i = 0; i < DISPLAY_WIDTH; ++i) {
                 AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
                 AIOWriteSPI(handle, cmdBuf, 2);
                 AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
 
-                xfer.rx_buf = 0;
-                xfer.tx_buf = (unsigned long) dataBufPtr;
-                xfer.len = 320;
+
                 ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
-                if (i % 10 == 0) {
-                    dataBufPtr++;
+                if (i % 5 == 0) {
+                    *dataBufPtr++;
+                    xfer.tx_buf = (unsigned long) dataBufPtr;
+                    printf("increment\n");
                 }
             }
         }
