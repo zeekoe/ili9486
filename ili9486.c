@@ -150,8 +150,8 @@ void InitILI9486() {
 
         unsigned long dataBuf[2000];
         int x = 0;
-        for(unsigned long i = 0; i < 16384; i += 25) {
-            dataBuf[x] = i;
+        for(unsigned long i = 0; i < 16384; i += 10) {
+            dataBuf[x] = (i>>8) | (i<<8);
             x++;
         }
         unsigned long *dataBufPtr = dataBuf;
