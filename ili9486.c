@@ -148,9 +148,9 @@ void InitILI9486() {
         SPI_TRANSFER(0x38/*Idle Mode OFF*/, 0);
         SPI_TRANSFER(0x13/*Normal Display Mode ON*/, 0);
 
-        unsigned long dataBuf[1000];
+        unsigned long dataBuf[2000];
         int x = 0;
-        for(unsigned long i = 0; i < 16384; i += 52) {
+        for(unsigned long i = 0; i < 16384; i += 25) {
             dataBuf[x] = i;
             x++;
         }
@@ -173,8 +173,8 @@ void InitILI9486() {
 
             ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
-            if (y % 5 == 0) {
-                dataBufPtr++;
+            if (y % 10 == 0) {
+                dataBufPtr+=10;
                 xfer.tx_buf = (unsigned long) dataBufPtr;
             }
         }
