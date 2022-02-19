@@ -176,7 +176,7 @@ void InitILI9486() {
             ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
             if (y % 5 == 0) {
-                dataBufPtr+=20;
+                dataBufPtr+=10;
                 xfer.tx_buf = (unsigned long) dataBufPtr;
             }
         }
