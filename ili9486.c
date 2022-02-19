@@ -148,6 +148,15 @@ void InitILI9486() {
         SPI_TRANSFER(0x38/*Idle Mode OFF*/, 0);
         SPI_TRANSFER(0x13/*Normal Display Mode ON*/, 0);
 
+        unsigned char dataBuf[1000];
+        for(int i = 0; i < 1000; i++) {
+            dataBuf[i] = (unsigned char) i;
+        }
+        unsigned char *dataBufPtr = dataBuf;
+        xfer.rx_buf = 0;
+        xfer.tx_buf = (unsigned long) dataBufPtr;
+        xfer.len = 320 * 2;
+
         for (int y = 0; y < DISPLAY_HEIGHT; ++y) {
             SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
             SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, (unsigned char) (y >> 8), 0, (unsigned char) (y & 0xFF), 0,
@@ -156,29 +165,17 @@ void InitILI9486() {
 
             unsigned char cmdBuf[2] = {0, DISPLAY_WRITE_PIXELS};
 
-            unsigned char dataBuf[1000];
-            for(int i = 0; i < 1000; i++) {
-                dataBuf[i] = (unsigned char) i;
-            }
-            unsigned char *dataBufPtr = dataBuf;
-            xfer.rx_buf = 0;
-            xfer.tx_buf = (unsigned long) dataBufPtr;
-            xfer.len = 320 * 2;
+            AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
+            AIOWriteSPI(handle, cmdBuf, 2);
+            AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
 
-            for (int i = 0; i < DISPLAY_WIDTH; ++i) {
-                AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
-                AIOWriteSPI(handle, cmdBuf, 2);
-                AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
+            ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
-
-                ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
-
-                if (i % 5 == 0) {
-                    *dataBufPtr++;
-                    xfer.tx_buf = (unsigned long) dataBufPtr;
-                    printf("increment\n");
-                    usleep(2000 * 1000);
-                }
+            if (y % 5 == 0) {
+                *dataBufPtr++;
+                xfer.tx_buf = (unsigned long) dataBufPtr;
+                printf("increment\n");
+                usleep(2000 * 1000);
             }
         }
         SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
