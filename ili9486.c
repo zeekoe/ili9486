@@ -4,6 +4,7 @@
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 #include "armbianio.h"
+#include <byteswap.h>
 
 #define DISPLAY_SET_CURSOR_X 0x2A
 #define DISPLAY_SET_CURSOR_Y 0x2B
@@ -150,8 +151,8 @@ void InitILI9486() {
 
         unsigned long dataBuf[2000];
         int x = 0;
-        for(unsigned long i = 0; i < 16384; i += 10) {
-            dataBuf[x] = (i>>8) | (i<<8);
+        for(unsigned short i = 0; i < 65535; i += 100) {
+            dataBuf[x] = (unsigned long) __bswap_16(i);
 //            dataBuf[x] = i;
             x++;
         }
@@ -174,8 +175,8 @@ void InitILI9486() {
 
             ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
-            if (y % 10 == 0) {
-                dataBufPtr+=10;
+            if (y % 5 == 0) {
+                dataBufPtr+=20;
                 xfer.tx_buf = (unsigned long) dataBufPtr;
             }
         }
