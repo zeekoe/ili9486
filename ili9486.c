@@ -177,7 +177,7 @@ void InitILI9486() {
                     *dataBufPtr++;
                     xfer.tx_buf = (unsigned long) dataBufPtr;
                     printf("increment\n");
-                    usleep(2000 * 1000)
+                    usleep(2000 * 1000);
                 }
             }
         }
