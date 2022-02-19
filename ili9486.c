@@ -152,7 +152,7 @@ void InitILI9486() {
         unsigned long dataBuf[4000];
         int x = 0;
         for(unsigned short i = 0; i < 65535; i += 100) {
-            dataBuf[x] = (unsigned long) __bswap_16(i);
+            dataBuf[x] = (i>>8) | (i<<8);
 //            dataBuf[x] = i;
             x++;
         }
