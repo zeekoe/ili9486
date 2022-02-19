@@ -172,10 +172,8 @@ void InitILI9486() {
             ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 
             if (y % 5 == 0) {
-                *dataBufPtr++;
+                dataBufPtr++;
                 xfer.tx_buf = (unsigned long) dataBufPtr;
-                printf("increment\n");
-                usleep(2000 * 1000);
             }
         }
         SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
