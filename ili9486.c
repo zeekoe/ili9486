@@ -149,7 +149,7 @@ void InitILI9486() {
         SPI_TRANSFER(0x38/*Idle Mode OFF*/, 0);
         SPI_TRANSFER(0x13/*Normal Display Mode ON*/, 0);
 
-        unsigned long dataBuf[4000];
+        unsigned long dataBuf[2000];
         int x = 0;
         for(unsigned short i = 0; i < 65535; i += 100) {
             dataBuf[x] = (unsigned long) __bswap_16(i);
