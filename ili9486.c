@@ -15,6 +15,8 @@
 #define DISPLAY_WIDTH DISPLAY_NATIVE_HEIGHT
 #define DISPLAY_HEIGHT DISPLAY_NATIVE_WIDTH
 
+#define SPI_BYTESPERPIXEL 2
+
 /*
 #define GPIO_SPI0_MOSI  10        // Pin P1-19, MOSI when SPI0 in use (display, touch)
 #define GPIO_SPI0_MISO   9        // Pin P1-21, MISO when SPI0 in use (touch)
@@ -186,7 +188,7 @@ void InitILI9486() {
         unsigned short *dataBufPtr = dataBuf;
         xfer.rx_buf = 0;
         xfer.tx_buf = (unsigned long) dataBufPtr;
-        xfer.len = 320 * 2;
+        xfer.len = DISPLAY_WIDTH * SPI_BYTESPERPIXEL;
 
         for (int y = 0; y < DISPLAY_HEIGHT; ++y) {
             SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
