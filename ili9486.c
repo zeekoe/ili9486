@@ -128,7 +128,7 @@ void InitILI9486() {
 #define MADCTL_ROTATE_180_DEGREES (MADCTL_COLUMN_ADDRESS_ORDER_SWAP | MADCTL_ROW_ADDRESS_ORDER_SWAP)
 
         unsigned char madctl = 0;
-        madctl |= MADCTL_BGR_PIXEL_ORDER;
+//        madctl |= MADCTL_BGR_PIXEL_ORDER;
 #ifdef DISPLAY_ROTATE_180_DEGREES
         madctl ^= MADCTL_ROTATE_180_DEGREES;
 #endif
@@ -151,29 +151,29 @@ void InitILI9486() {
         unsigned long dataBuf[1000];
         for(unsigned long i = 0; i < 1000; i += 1) {
             if (i < 20) {
-                dataBuf[i] = 0xffff;
+                dataBuf[i] = 0xffff; // wit
             } else if (i < 40) {
-                dataBuf[i] = 0x0fff;
+                dataBuf[i] = 0x0fff; // beige
             } else if (i < 60) {
-                dataBuf[i] = 0x00ff;
+                dataBuf[i] = 0x00ff; // geel
             } else if (i < 80) {
-                dataBuf[i] = 0x000f;
+                dataBuf[i] = 0x000f; // groen
             } else if (i < 100) {
-                dataBuf[i] = 0x0000;
+                dataBuf[i] = 0x0000; // zwart
             } else if (i < 120) {
-                dataBuf[i] = 0xf000;
+                dataBuf[i] = 0xf000; // blauw
             } else if (i < 140) {
-                dataBuf[i] = 0x0f00;
+                dataBuf[i] = 0x0f00; // donkerblauw
             } else if (i < 160) {
-                dataBuf[i] = 0x00f0;
+                dataBuf[i] = 0x00f0; // rood
             } else if (i < 180) {
-                dataBuf[i] = 0x000f;
+                dataBuf[i] = 0x000f; // groen
             } else if (i < 200) {
-                dataBuf[i] = 0x0008;
+                dataBuf[i] = 0x0008; // zwart
             } else if (i < 220) {
-                dataBuf[i] = 0x0080;
+                dataBuf[i] = 0x0080; // bruin
             } else if (i < 240) {
-                dataBuf[i] = 0x0800;
+                dataBuf[i] = 0x0800; // donkerblauw
             } else if (i < 260) {
                 dataBuf[i] = 0x8000;
             } else {
