@@ -200,11 +200,6 @@ void InitILI9486() {
         SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
         SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
     }
-    usleep(1000 * 3000);
-
-    SPI_TRANSFER(0x28/*Display OFF*/, 0);
-    SPI_TRANSFER(0x10/*Enter Sleep Mode*/, 0);
-
     END_SPI_COMMUNICATION;
 }
 
