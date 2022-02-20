@@ -150,32 +150,32 @@ void InitILI9486() {
 
         unsigned short dataBuf[1000];
         for(unsigned short i = 0; i < 1000; i += 1) {
-            if (i < 10) {
+            if (i < 20) {
                 dataBuf[i] = 0xffff; // wit
-            } else if (i < 20) {
-                dataBuf[i] = 0x0fff; // lichtblauw
-            } else if (i < 30) {
-                dataBuf[i] = 0x00ff; // lichtblauw
             } else if (i < 40) {
-                dataBuf[i] = 0x000f; // groen
-            } else if (i < 50) {
-                dataBuf[i] = 0x0000; // zwart
+                dataBuf[i] = 0x00ff;
             } else if (i < 60) {
-                dataBuf[i] = 0xf000; // rodig
-            } else if (i < 70) {
-                dataBuf[i] = 0x0f00; // rodig
+                dataBuf[i] = 0x0ff0;
             } else if (i < 80) {
-                dataBuf[i] = 0x00f0; // blauw
-            } else if (i < 90) {
-                dataBuf[i] = 0x000f; // groen
+                dataBuf[i] = 0xff00;
             } else if (i < 100) {
-                dataBuf[i] = 0x0008; // zwart
-            } else if (i < 110) {
-                dataBuf[i] = 0x0080; // bruin
+                dataBuf[i] = 0xf00f;
             } else if (i < 120) {
-                dataBuf[i] = 0x0800; // donkerblauw
-            } else if (i < 130) {
-                dataBuf[i] = 0x8000;
+                dataBuf[i] = 0xf000;
+            } else if (i < 140) {
+                dataBuf[i] = 0x0f00;
+            } else if (i < 160) {
+                dataBuf[i] = 0x00f0;
+            } else if (i < 180) {
+                dataBuf[i] = 0x000f;
+            } else if (i < 200) {
+                dataBuf[i] = 0x0008;
+            } else if (i < 220) {
+                dataBuf[i] = 0x0880;
+            } else if (i < 240) {
+                dataBuf[i] = 0x8800;
+            } else if (i < 260) {
+                dataBuf[i] = 0x8008;
             } else {
                 dataBuf[i] = 0xaaaa;
             }
