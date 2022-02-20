@@ -148,24 +148,24 @@ void InitILI9486() {
         SPI_TRANSFER(0x38/*Idle Mode OFF*/, 0);
         SPI_TRANSFER(0x13/*Normal Display Mode ON*/, 0);
 
-        unsigned long dataBuf[1000];
-        for(unsigned long i = 0; i < 1000; i += 1) {
+        unsigned short dataBuf[1000];
+        for(unsigned short i = 0; i < 1000; i += 1) {
             if (i < 10) {
                 dataBuf[i] = 0xffff; // wit
             } else if (i < 20) {
-                dataBuf[i] = 0x0fff; // beige
+                dataBuf[i] = 0x0fff; // lichtblauw
             } else if (i < 30) {
-                dataBuf[i] = 0x00ff; // geel
+                dataBuf[i] = 0x00ff; // lichtblauw
             } else if (i < 40) {
                 dataBuf[i] = 0x000f; // groen
             } else if (i < 50) {
                 dataBuf[i] = 0x0000; // zwart
             } else if (i < 60) {
-                dataBuf[i] = 0xf000; // blauw
+                dataBuf[i] = 0xf000; // rodig
             } else if (i < 70) {
-                dataBuf[i] = 0x0f00; // donkerblauw
+                dataBuf[i] = 0x0f00; // rodig
             } else if (i < 80) {
-                dataBuf[i] = 0x00f0; // rood
+                dataBuf[i] = 0x00f0; // blauw
             } else if (i < 90) {
                 dataBuf[i] = 0x000f; // groen
             } else if (i < 100) {
@@ -181,7 +181,7 @@ void InitILI9486() {
             }
 
         }
-        unsigned long *dataBufPtr = dataBuf;
+        unsigned short *dataBufPtr = dataBuf;
         xfer.rx_buf = 0;
         xfer.tx_buf = (unsigned long) dataBufPtr;
         xfer.len = 320 * 2;
