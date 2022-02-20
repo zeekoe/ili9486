@@ -188,11 +188,11 @@ void InitILI9486() {
         xfer.tx_buf = (unsigned long) dataBufPtr;
         xfer.len = 320 * 2;
 
-        for (int y = 0; y < DISPLAY_WIDTH; ++y) {
-            SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
+        for (int y = 0; y < DISPLAY_HEIGHT; ++y) {
+            SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
             SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, (unsigned char) (y >> 8), 0, (unsigned char) (y & 0xFF), 0,
-                         (DISPLAY_WIDTH - 1) >> 8,
-                         0, (DISPLAY_WIDTH - 1) & 0xFF);
+                         (DISPLAY_HEIGHT - 1) >> 8,
+                         0, (DISPLAY_HEIGHT - 1) & 0xFF);
 
             unsigned char cmdBuf[2] = {0, DISPLAY_WRITE_PIXELS};
 
@@ -207,8 +207,8 @@ void InitILI9486() {
                 xfer.tx_buf = (unsigned long) dataBufPtr;
             }
         }
-        SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
-        SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
+        SPI_TRANSFER(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
+        SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
     }
     END_SPI_COMMUNICATION;
 }
