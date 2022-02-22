@@ -31,6 +31,7 @@
 
 #define GPIO_TFT_DATA_CONTROL 18 // bcm 24
 #define GPIO_TFT_RESET_PIN 22 // bcm 25
+#define GPIO_BACKLIGHT 38
 
 #define BEGIN_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 0);
 #define END_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 1);
@@ -82,6 +83,8 @@ void InitILI9486() {
     AIOAddGPIO(GPIO_TFT_DATA_CONTROL, GPIO_OUT);
     printf("GPIO_TFT_RESET_PIN\n");
     AIOAddGPIO(GPIO_TFT_RESET_PIN, GPIO_OUT);
+    AIOAddGPIO(GPIO_BACKLIGHT, GPIO_OUT);
+    AIOWriteGPIO(GPIO_BACKLIGHT, 0);
 
 
 
@@ -201,6 +204,8 @@ void InitILI9486() {
         SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
     }
     END_SPI_COMMUNICATION;
+    usleep(1000*2000);
+    AIOWriteGPIO(GPIO_BACKLIGHT, 1);
 }
 
 void drawRow(int y, const unsigned short *dataBufPtr) {
