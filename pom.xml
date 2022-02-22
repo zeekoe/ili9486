@@ -37,7 +37,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>nl.ronaldteune.jcdlcd.PapierUI</mainClass>
+                            <mainClass>nl.ronaldteune.ili9486.Tester</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
