@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
-#include "armbianio.h"
+#include <fcntl.h>
+#include <linux/types.h>
+#include <errno.h>
+
+#define GPIO_OUT 0
+#define GPIO_IN 1
+#define MAX_PINS 51
+static int iPinHandles[MAX_PINS];
 
 #define DISPLAY_SET_CURSOR_X 0x2A
 #define DISPLAY_SET_CURSOR_Y 0x2B
@@ -39,6 +47,11 @@ int handle;
 static struct spi_ioc_transfer xfer;
 
 void drawRow(int y, const unsigned short *dataBufPtr);
+int AIOOpenSPI(int iChannel, int iSPIFreq);
+int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen);
+int AIOWriteGPIO(int iPin, int iValue);
+int AIOAddGPIO(int iPin, int iDirection);
+void AIORemoveGPIO(int iPin);
 
 void SPI_TRANSFER(char cmd, int num_args, ...) {
     va_list ap;
@@ -71,7 +84,7 @@ void SPI_TRANSFER(char cmd, int num_args, ...) {
 
 }
 
-void InitILI9486() {
+void initDisplay() {
 //    printf("GPIO_SPI0_CE0\n");
 //    AIOAddGPIO(GPIO_SPI0_CE0, GPIO_OUT);
 //    printf("GPIO_SPI0_MOSI\n");
@@ -221,3 +234,111 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
 
     ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 }
+
+
+
+static int iRPIPins[] = {-1,-1,-1,2,-1,3,-1,4,14,-1,
+                         15,17,18,27,-1,22,23,-1,24,10,
+                         -1,9,25,11,8,-1,7,0,1,5,
+                         -1,6,12,13,-1,19,16,26,20,-1,
+                         21};
+
+int AIOOpenSPI(int iChannel, int iSPIFreq)
+{
+    int rc, iSPIMode = SPI_MODE_0; // | SPI_NO_CS;
+    char szName[32];
+    int file_spi;
+    int i = iSPIFreq;
+
+    sprintf(szName,"/dev/spidev%d.0", iChannel);
+    file_spi = open(szName, O_RDWR);
+    rc = ioctl(file_spi, SPI_IOC_WR_MODE, &iSPIMode);
+    if (rc < 0) fprintf(stderr, "Error setting SPI mode\n");
+    rc = ioctl(file_spi, SPI_IOC_WR_MAX_SPEED_HZ, &i);
+    if (rc < 0) fprintf(stderr, "Error setting SPI speed\n");
+    memset(&xfer, 0, sizeof(xfer));
+    xfer.speed_hz = iSPIFreq;
+    xfer.cs_change = 0;
+    xfer.delay_usecs = 0;
+    xfer.bits_per_word = 8;
+
+    if (file_spi < 0)
+    {
+        fprintf(stderr, "Failed to open the SPI bus\n");
+        return -1;
+    }
+    return file_spi;
+} /* AIOOpenSPI() */
+
+
+
+int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen)
+{
+    int rc;
+    xfer.rx_buf = 0;
+    xfer.tx_buf = (unsigned long)pBuf;
+    xfer.len = iLen;
+    rc = ioctl(iHandle, SPI_IOC_MESSAGE(1), &xfer);
+    return rc;
+} /* AIOWriteSPI() */
+
+
+//
+// Write a 0 or 1 to a GPIO output line
+//
+int AIOWriteGPIO(int iPin, int iValue)
+{
+    int rc, iGPIO;
+    char szTemp[64];
+    int *pPins;
+
+    if (iPinHandles[iPin] == -1) // not open yet
+    {
+        pPins = iRPIPins;
+        iGPIO = pPins[iPin]; // convert to GPIO number
+        sprintf(szTemp, "/sys/class/gpio/gpio%d/value", iGPIO);
+        iPinHandles[iPin] = open(szTemp, O_WRONLY);
+    }
+    if (iValue) rc = write(iPinHandles[iPin], "1", 1);
+    else rc = write(iPinHandles[iPin], "0", 1);
+    if (rc < 0) // error
+    { // do something
+    }
+    return 1;
+} /* AIOWriteGPIO() */
+
+int AIOAddGPIO(int iPin, int iDirection)
+{
+    char szName[64];
+    int file_gpio, rc, iGPIO;
+    int *pPins;
+
+    pPins = iRPIPins;
+
+    file_gpio = open("/sys/class/gpio/export", O_WRONLY);
+    if (file_gpio < 1) {
+        fprintf(stderr, "Error opening /sys/class/gpio/export = %d\n", errno);
+        return 0;
+    }
+    iGPIO = pPins[iPin];
+    sprintf(szName, "%d", iGPIO);
+    rc = write(file_gpio, szName, strlen(szName));
+    close(file_gpio);
+    usleep(200000); // allow time for udev to make the needed changes
+    sprintf(szName, "/sys/class/gpio/gpio%d/direction", iGPIO);
+    file_gpio = open(szName, O_WRONLY);
+    if (file_gpio < 1) {
+        fprintf(stderr, "error setting direction on GPIO pin %d\n", iGPIO);
+        return 0;
+    }
+    if (iDirection == GPIO_OUT)
+        rc = write(file_gpio, "out\n", 4);
+    else
+        rc = write(file_gpio, "in\n", 3);
+    close(file_gpio);
+    if (rc < 0)
+    {
+        fprintf(stderr, "Error setting mode on GPIO pin %d\n", iGPIO);
+    }
+    return 1;
+} /* AIOAddGPIO() */

@@ -5,6 +5,8 @@
 #ifndef ILI9486_ILI9486_H
 #define ILI9486_ILI9486_H
 
-void InitILI9486();
+void initDisplay();
+
+void drawRow(int y, const unsigned short *dataBufPtr)
 
 #endif //ILI9486_ILI9486_H
