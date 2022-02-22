@@ -1,4 +1,4 @@
-package armbianio;
+package nl.ronaldteune.ili9486;
 
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
