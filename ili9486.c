@@ -72,15 +72,15 @@ void SPI_TRANSFER(char cmd, int num_args, ...) {
 }
 
 void InitILI9486() {
+    BEGIN_SPI_COMMUNICATION;
+    usleep(1000*300);
 //    printf("GPIO_SPI0_CE0\n");
 //    AIOAddGPIO(GPIO_SPI0_CE0, GPIO_OUT);
 //    printf("GPIO_SPI0_MOSI\n");
 //    AIOAddGPIO(GPIO_SPI0_MOSI, GPIO_OUT);
 //    printf("GPIO_SPI0_CLK\n");
 //    AIOAddGPIO(GPIO_SPI0_CLK, GPIO_OUT);
-    printf("GPIO_TFT_DATA_CONTROL\n");
     AIOAddGPIO(GPIO_TFT_DATA_CONTROL, GPIO_OUT);
-    printf("GPIO_TFT_RESET_PIN\n");
     AIOAddGPIO(GPIO_TFT_RESET_PIN, GPIO_OUT);
 
 
@@ -106,7 +106,7 @@ void InitILI9486() {
     // Do the initialization with a very low SPI bus speed, so that it will succeed even if the bus speed chosen by the user is too high.
 //    __sync_synchronize();
 
-    BEGIN_SPI_COMMUNICATION;
+
     {
         SPI_TRANSFER(0xB0/*Interface Mode Control*/, 2, 0x00,
                      0x00/*DE polarity=High enable, PCKL polarity=data fetched at rising time, HSYNC polarity=Low level sync clock, VSYNC polarity=Low level sync clock*/);
