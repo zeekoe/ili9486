@@ -28,6 +28,7 @@
 #define GPIO_SPI0_MOSI 19
 #define GPIO_SPI0_CLK 23
 #define GPIO_SPI0_CE0 24
+#define GPIO_SPI0_CE1 26
 
 #define GPIO_TFT_DATA_CONTROL 18 // bcm 24
 #define GPIO_TFT_RESET_PIN 22 // bcm 25
@@ -72,6 +73,7 @@ void SPI_TRANSFER(char cmd, int num_args, ...) {
 }
 
 void InitILI9486() {
+    AIOAddGPIO(GPIO_SPI0_CE1, GPIO_IN);
     BEGIN_SPI_COMMUNICATION;
     usleep(1000*300);
 //    printf("GPIO_SPI0_CE0\n");
