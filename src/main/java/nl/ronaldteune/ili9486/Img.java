@@ -24,7 +24,7 @@ public class Img {
         g2d.clearRect(0, 0, WIDTH, HEIGHT);
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("DejaVu Sans", Font.PLAIN, 20));
-        g2d.drawString("Hoi hoi test test", 50, 50);
+        g2d.drawString("Hoi hoi test test", 100, 100);
 
         final URL resource = Img.class.getClassLoader().getResource("radio.png");
         try {
