@@ -7,6 +7,8 @@
 
 void initDisplay();
 
+void deInitDisplay();
+
 void drawRow(int y, const unsigned short *dataBufPtr);
 
 #endif //ILI9486_ILI9486_H

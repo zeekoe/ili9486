@@ -14,8 +14,11 @@ public class Tester {
         Thread.sleep(2000);
         final short[] data = new short[480];
         for (short i = 0; i < data.length; i++) {
-            data[i] = 12345;
+            data[i] = 12345 - i * 10;
         }
         ili9486.drawRow(10, data);
+
+        Thread.sleep(3000);
+        ili9486.deInitDisplay();
     }
 }

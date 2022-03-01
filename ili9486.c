@@ -220,7 +220,9 @@ void initDisplay() {
         SPI_TRANSFER(DISPLAY_SET_CURSOR_Y, 8, 0, 0, 0, 0, 0, (DISPLAY_HEIGHT - 1) >> 8, 0, (DISPLAY_HEIGHT - 1) & 0xFF);
     }
     END_SPI_COMMUNICATION;
-    usleep(1000*2000);
+}
+
+void deInitDisplay() {
     AIOWriteGPIO(GPIO_BACKLIGHT, 1);
 }
 

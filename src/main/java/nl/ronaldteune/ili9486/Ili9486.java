@@ -7,6 +7,7 @@ import com.sun.jna.Pointer;
 public interface Ili9486 extends Library {
 
 	void initDisplay();
+	void deInitDisplay();
 
     void drawRow(int y, short[] data);
 
