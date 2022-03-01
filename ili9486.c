@@ -86,6 +86,8 @@ void SPI_TRANSFER(char cmd, int num_args, ...) {
 }
 
 void initDisplay() {
+    memset(iPinHandles, -1, sizeof(iPinHandles));
+
 //    printf("GPIO_SPI0_CE0\n");
 //    AIOAddGPIO(GPIO_SPI0_CE0, GPIO_OUT);
 //    printf("GPIO_SPI0_MOSI\n");
@@ -241,7 +243,12 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
     ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 }
 
-
+// Tinkerboard
+static int iTinkerPins[] = {-1,-1,-1,252,-1,253,-1,17,161,-1,
+                            160,164,184,166,-1,167,162,-1,163,257,
+                            -1,256,171,254,255,-1,251,233,234,165,
+                            -1,168,239,238,-1,185,223,224,187,-1,
+                            188};
 
 static int iRPIPins[] = {-1,-1,-1,2,-1,3,-1,4,14,-1,
                          15,17,18,27,-1,22,23,-1,24,10,
@@ -300,7 +307,7 @@ int AIOWriteGPIO(int iPin, int iValue)
 
     if (iPinHandles[iPin] == -1) // not open yet
     {
-        pPins = iRPIPins;
+        pPins = iTinkerPins;
         iGPIO = pPins[iPin]; // convert to GPIO number
         sprintf(szTemp, "/sys/class/gpio/gpio%d/value", iGPIO);
         iPinHandles[iPin] = open(szTemp, O_WRONLY);
@@ -319,7 +326,7 @@ int AIOAddGPIO(int iPin, int iDirection)
     int file_gpio, rc, iGPIO;
     int *pPins;
 
-    pPins = iRPIPins;
+    pPins = iTinkerPins;
 
     file_gpio = open("/sys/class/gpio/export", O_WRONLY);
     if (file_gpio < 1) {
