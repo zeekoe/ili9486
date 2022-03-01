@@ -98,7 +98,7 @@ void InitILI9486() {
     AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
     usleep(120 * 1000);
 
-    handle = AIOOpenSPI(2, 8000000);
+    handle = AIOOpenSPI(2, 20000000);
 
 //    unsigned char buf[1024] = {0}; // room for 1024 chars (or 1023 + a 0 byte for a string)
 //    unsigned char *str = buf;
