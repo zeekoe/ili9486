@@ -16,7 +16,9 @@ public class Tester {
         for (short i = 0; i < data.length; i++) {
             data[i] = (short) (12345 - i * 10);
         }
-        ili9486.drawRow(10, data);
+        for(int i = 0; i < 320; i++) {
+            ili9486.drawRow(i, data);
+        }
 
         Thread.sleep(3000);
         ili9486.deInitDisplay();
