@@ -100,20 +100,19 @@ void initDisplay() {
     AIOAddGPIO(GPIO_TFT_RESET_PIN, GPIO_OUT);
     AIOAddGPIO(GPIO_BACKLIGHT, GPIO_OUT);
     AIOWriteGPIO(GPIO_BACKLIGHT, 0);
-    usleep(100 * 1000);
-
-
+    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
+    usleep(5 * 1000);
 
     // If a Reset pin is defined, toggle it briefly high->low->high to enable the device. Some devices do not have a reset pin, in which case compile with GPIO_TFT_RESET_PIN left undefined.
     printf("Resetting display at reset GPIO pin %d\n", GPIO_TFT_RESET_PIN);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
-    usleep(120 * 1000);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 0);
-    usleep(120 * 1000);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
-    usleep(120 * 1000);
 
-    handle = AIOOpenSPI(2, 20000000);
+    usleep(100);
+    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 0);
+    usleep(100);
+    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
+    usleep(5 * 1000);
+
+    handle = AIOOpenSPI(2, 15000000);
 
 //    unsigned char buf[1024] = {0}; // room for 1024 chars (or 1023 + a 0 byte for a string)
 //    unsigned char *str = buf;
@@ -126,11 +125,12 @@ void initDisplay() {
 //    __sync_synchronize();
 
     BEGIN_SPI_COMMUNICATION;
+    usleep(10);
     {
         SPI_TRANSFER(0xB0/*Interface Mode Control*/, 2, 0x00,
                      0x00/*DE polarity=High enable, PCKL polarity=data fetched at rising time, HSYNC polarity=Low level sync clock, VSYNC polarity=Low level sync clock*/);
         SPI_TRANSFER(0x11/*Sleep OUT*/, 0);
-        usleep(120 * 1000);
+        usleep(5 * 1000);
 
         const unsigned char pixelFormat = 0x55; /*DPI(RGB Interface)=16bits/pixel, DBI(CPU Interface)=16bits/pixel*/
 
