@@ -123,6 +123,7 @@ void initDisplay() {
         spiTransfer(0xC2/*Power Control 3*/, 2, 0x00, 0x33);
         spiTransfer(0xC5/*VCOM Control*/, 4, 0x00, 0x00, 0x00, 0x36);
 
+#define MADCTL_BGR_PIXEL_ORDER (1<<3)
 #define MADCTL_ROW_COLUMN_EXCHANGE (1<<5)
 #define MADCTL_COLUMN_ADDRESS_ORDER_SWAP (1<<6)
 #define MADCTL_ROW_ADDRESS_ORDER_SWAP (1<<7)
@@ -132,6 +133,7 @@ void initDisplay() {
 
         madctl |= MADCTL_ROW_COLUMN_EXCHANGE;
         madctl ^= MADCTL_ROTATE_180_DEGREES;
+        madctl |= MADCTL_BGR_PIXEL_ORDER;
 
         spiTransfer(0x36/*MADCTL: Memory Access Control*/, 2, 0x00, madctl);
         spiTransfer(0xE0/*Positive Gamma Control*/, 30, 0x00, 0x00, 0x00, 0x2C, 0x00, 0x2C, 0x00, 0x0B, 0x00, 0x0C,
@@ -164,7 +166,7 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
         unsigned short val = *dataBufPtrTransform;
         val = (val << 8) | ((val >> 8) & 0xFF);
 
-        *dataBufPtrTransform = (short) (((val & ((short) 0b111110000000000)) >> 5) | ((val & ((short) 0b0000011111100000)) << 5) | ((val & ((short) 0b0000000000011111))));
+        *dataBufPtrTransform = (unsigned short) val;
         if (i < DISPLAY_WIDTH - 1) {
             *dataBufPtrTransform++;
         }

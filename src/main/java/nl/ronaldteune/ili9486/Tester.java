@@ -12,15 +12,11 @@ public class Tester {
         final Ili9486 ili9486 = Native.load("/usr/local/lib/ili9486.so", Ili9486.class);
         ili9486.initDisplay();
 
-        short[] row = new short[480];
-
         try {
             while (true) {
-                for(int i = 0; i < 480; i++) {
-                    row[i] = (short) 0b1000000000000000;
-                }
+                final Img img = new Img();
                 for (int i = 0; i < 320; i++) {
-                    ili9486.drawRowRaw(i, row);
+                    ili9486.drawRow(i, img.getRow(i));
                 }
 
                 Thread.sleep(100);
