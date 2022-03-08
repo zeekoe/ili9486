@@ -10,9 +10,14 @@ int main() {
 
     initDisplay();
 
-    usleep(1000*2000);
-    printf("en nu weer uit\n");
+    unsigned short row[480] = {0};
 
-    deInitDisplay();
+    for(int i = 0; i < 480; i++) {
+        row[i] = (short) 0b1000000000000000;
+    }
+    for (int i = 0; i < 320; i++) {
+        drawRowRaw(i, row);
+    }
+
     return 0;
 }
