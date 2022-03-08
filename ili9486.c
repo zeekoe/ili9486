@@ -156,6 +156,16 @@ void deInitDisplay() {
 }
 
 void drawRow(int y, const unsigned short *dataBufPtr) {
+    short *dataBufPtrTransform;
+    dataBufPtrTransform = dataBufPtr;
+    for (int i = 0; i < DISPLAY_WIDTH * SPI_BYTESPERPIXEL; i++) {
+        unsigned short val = *dataBufPtrTransform;
+        val = (val << 8) | ((val >> 8) & 0xFF);
+
+        *dataBufPtrTransform = (short) (((val & ((short) 0b111110000000000)) >> 5) | ((val & ((short) 0b0000011111100000)) << 5) | ((val & ((short) 0b0000000000011111))));
+        *dataBufPtrTransform++;
+    }
+
     spiTransfer(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
     spiTransfer(DISPLAY_SET_CURSOR_Y, 8, 0, (unsigned char) (y >> 8), 0, (unsigned char) (y & 0xFF), 0,
                 (DISPLAY_HEIGHT - 1) >> 8,
