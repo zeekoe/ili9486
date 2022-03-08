@@ -53,6 +53,8 @@ int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen);
 int AIOWriteGPIO(int iPin, int iValue);
 int AIOAddGPIO(int iPin, int iDirection);
 
+void drawRowRaw(int y, const unsigned short *dataBufPtr);
+
 void spiTransfer(char cmd, int num_args, ...) {
     va_list ap;
 
@@ -168,6 +170,10 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
         }
     }
 
+    drawRowRaw(y, dataBufPtr);
+}
+
+void drawRowRaw(int y, const unsigned short *dataBufPtr) {
     spiTransfer(DISPLAY_SET_CURSOR_X, 8, 0, 0, 0, 0, 0, (DISPLAY_WIDTH - 1) >> 8, 0, (DISPLAY_WIDTH - 1) & 0xFF);
     spiTransfer(DISPLAY_SET_CURSOR_Y, 8, 0, (unsigned char) (y >> 8), 0, (unsigned char) (y & 0xFF), 0,
                 (DISPLAY_HEIGHT - 1) >> 8,

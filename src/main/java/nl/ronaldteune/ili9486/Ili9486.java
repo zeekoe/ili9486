@@ -10,5 +10,6 @@ public interface Ili9486 extends Library {
 	void deInitDisplay();
 
     void drawRow(int y, short[] data);
+    void drawRowRaw(int y, short[] data);
 
 }
