@@ -52,8 +52,8 @@ int AIOOpenSPI(int iChannel, int iSPIFreq);
 int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen);
 int AIOWriteGPIO(int iPin, int iValue);
 int AIOAddGPIO(int iPin, int iDirection);
-
 void drawRowRaw(int y, const unsigned short *dataBufPtr);
+void swapEndianness(const unsigned short *dataBufPtr);
 
 void spiTransfer(char cmd, int num_args, ...) {
     va_list ap;
@@ -86,6 +86,7 @@ void spiTransfer(char cmd, int num_args, ...) {
 }
 
 void initDisplay() {
+    printf("init\n");
     memset(iPinHandles, -1, sizeof(iPinHandles));
 
     AIOAddGPIO(GPIO_TFT_DATA_CONTROL, GPIO_OUT);
@@ -146,8 +147,7 @@ void initDisplay() {
                     0x14, 0x00, 0x0F);
         spiTransfer(0xB6/*Display Function Control*/, 6, 0, 0, 0, /*ISC=2*/2, 0, /*Display Height h=*/
                     59); // Actual display height = (h+1)*8 so (59+1)*8=480
-        spiTransfer(0x11/*Sleep OUT*/, 0);
-        usleep(120 * 1000);
+        usleep(5 * 1000);
         spiTransfer(0x29/*Display ON*/, 0);
         spiTransfer(0x38/*Idle Mode OFF*/, 0);
         spiTransfer(0x13/*Normal Display Mode ON*/, 0);
@@ -160,19 +160,19 @@ void deInitDisplay() {
 }
 
 void drawRow(int y, const unsigned short *dataBufPtr) {
+    swapEndianness(dataBufPtr);
+    drawRowRaw(y, dataBufPtr);
+}
+
+void swapEndianness(const unsigned short *dataBufPtr) {
     short *dataBufPtrTransform;
     dataBufPtrTransform = dataBufPtr;
     for (int i = 0; i < DISPLAY_WIDTH; i++) {
-        unsigned short val = *dataBufPtrTransform;
-        val = (val << 8) | ((val >> 8) & 0xFF);
-
-        *dataBufPtrTransform = (unsigned short) val;
+        *dataBufPtrTransform = (unsigned short) ((*dataBufPtrTransform << 8) | ((*dataBufPtrTransform >> 8) & 0xFF));
         if (i < DISPLAY_WIDTH - 1) {
             *dataBufPtrTransform++;
         }
     }
-
-    drawRowRaw(y, dataBufPtr);
 }
 
 void drawRowRaw(int y, const unsigned short *dataBufPtr) {
