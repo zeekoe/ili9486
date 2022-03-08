@@ -22,21 +22,40 @@ public class Img {
 
     public Img() {
         g2d.clearRect(0, 0, WIDTH, HEIGHT);
-        g2d.setColor(Color.RED);
-        g2d.setFont(new Font("DejaVu Sans", Font.PLAIN, 20));
-        g2d.drawString("Hoi hoi test test", 100, 100);
 
-        final URL resource = Img.class.getClassLoader().getResource("radio.png");
+
+        final URL resource = Img.class.getClassLoader().getResource("colour.png");
         try {
             final BufferedImage image = ImageIO.read(resource);
             g2d.drawImage(image, null, 0,0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        g2d.setColor(Color.RED);
+        g2d.setFont(new Font("DejaVu Sans", Font.PLAIN, 20));
+        g2d.drawString("Rood", 100, 100);
+        g2d.setColor(Color.GREEN);
+        g2d.drawString("Groen", 100, 200);
+        g2d.setColor(Color.BLUE);
+        g2d.drawString("Blauw", 100, 300);
     }
 
     public short[] getRow(int x) {
         final short[] data = ((DataBufferUShort) buffer.getRaster().getDataBuffer()).getData();
-        return Arrays.copyOfRange(data, x * WIDTH, x * WIDTH + WIDTH);
+        final short[] range = Arrays.copyOfRange(data, x * WIDTH, x * WIDTH + WIDTH);
+        return range;
+//        short[] transformed = new short[range.length];
+//        for (int i = 0; i < range.length; i++) {
+//            final short b1 = (short) ((range[i] & 0xff00) >> 8);
+//            final short b2 = (short) ((range[i] & 0x00ff) << 8);
+//            range[i] = (short) (b1 | b2);
+//
+//            final short b = (short) ((range[i] & ((short) 0b111110000000000)) >> 5); // blauw
+//            final short r = (short) ((range[i] & ((short) 0b0000011111100000)) << 5); // rood
+//            final short g = (short) ((range[i] & ((short) 0b0000000000011111))); // groen?
+//            transformed[i] = (short) (r | g | b);
+//        }
+//        return transformed;
     }
 }
