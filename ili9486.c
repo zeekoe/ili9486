@@ -86,7 +86,6 @@ void spiTransfer(char cmd, int num_args, ...) {
 }
 
 void initDisplay() {
-    printf("init\n");
     memset(iPinHandles, -1, sizeof(iPinHandles));
 
     AIOAddGPIO(GPIO_TFT_DATA_CONTROL, GPIO_OUT);
