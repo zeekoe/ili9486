@@ -37,9 +37,9 @@ static int iPinHandles[MAX_PINS];
 #define GPIO_SPI0_CLK 23
 #define GPIO_SPI0_CE0 24
 
-#define GPIO_TFT_DATA_CONTROL 18 // bcm 24
-#define GPIO_TFT_RESET_PIN 22 // bcm 25
-#define GPIO_TFT_POWER 38
+#define GPIO_TFT_DATA_CONTROL 18 // overrides rotary encoder
+#define GPIO_TFT_RESET_PIN 22 // overrides IR sensor, which is at 11 for us
+#define GPIO_TFT_POWER 36 // was 38
 
 #define BEGIN_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 0);
 #define END_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 1);
