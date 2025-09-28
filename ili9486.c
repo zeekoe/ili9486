@@ -193,13 +193,6 @@ void drawRowRaw(int y, const unsigned short *dataBufPtr) {
     ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 }
 
-// Tinkerboard
-static int iTinkerPins[] = {-1,-1,-1,252,-1,253,-1,17,161,-1,
-                            160,164,184,166,-1,167,162,-1,163,257,
-                            -1,256,171,254,255,-1,251,233,234,165,
-                            -1,168,239,238,-1,185,223,224,187,-1,
-                            188};
-
 static int iRPIPins[] = {-1,-1,-1,2,-1,3,-1,4,14,-1,
                          15,17,18,27,-1,22,23,-1,24,10,
                          -1,9,25,11,8,-1,7,0,1,5,
@@ -257,7 +250,7 @@ int AIOWriteGPIO(int iPin, int iValue)
 
     if (iPinHandles[iPin] == -1) // not open yet
     {
-        pPins = iTinkerPins;
+        pPins = iRPIPins;
         iGPIO = pPins[iPin]; // convert to GPIO number
         sprintf(szTemp, "/sys/class/gpio/gpio%d/value", iGPIO);
         iPinHandles[iPin] = open(szTemp, O_WRONLY);
@@ -276,7 +269,7 @@ int AIOAddGPIO(int iPin, int iDirection)
     int file_gpio, rc, iGPIO;
     int *pPins;
 
-    pPins = iTinkerPins;
+    pPins = iRPIPins;
 
     file_gpio = open("/sys/class/gpio/export", O_WRONLY);
     if (file_gpio < 1) {
