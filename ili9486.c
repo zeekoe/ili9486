@@ -199,11 +199,21 @@ int initSpi(int iChannel, int iSPIFreq)
     int i = iSPIFreq;
 
     sprintf(szName,"/dev/spidev%d.0", iChannel);
+    printf(szName);
+    printf("\n");
     file_spi = open(szName, O_RDWR);
+    if (file_spi < 0) {
+        perror("Error opening SPI device");
+        return -1; // Exit or handle error appropriately
+    }
     rc = ioctl(file_spi, SPI_IOC_WR_MODE, &iSPIMode);
-    if (rc < 0) fprintf(stderr, "Error setting SPI mode\n");
+    if (rc < 0) {
+        perror("Error setting SPI mode");
+    }
     rc = ioctl(file_spi, SPI_IOC_WR_MAX_SPEED_HZ, &i);
-    if (rc < 0) fprintf(stderr, "Error setting SPI speed\n");
+    if (rc < 0) {
+        perror("Error setting SPI speed");
+    }
     memset(&xfer, 0, sizeof(xfer));
     xfer.speed_hz = iSPIFreq;
     xfer.cs_change = 0;
