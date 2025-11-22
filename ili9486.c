@@ -34,13 +34,13 @@ static int iPinHandles[MAX_PINS];
 #define GPIO_SPI0_CE1    7        // Pin P1-26, CE1 when SPI0 in use (touch panel)
  */
 
-#define GPIO_SPI0_MOSI 12 // physical 19
-#define GPIO_SPI0_CLK 14 // physical 23
-#define GPIO_SPI0_CE0 10 // physical 24
+#define GPIO_SPI0_MOSI 19
+#define GPIO_SPI0_CLK 23
+#define GPIO_SPI0_CE0 24
 
-#define GPIO_TFT_DATA_CONTROL 5 // physical 18 // overrides rotary encoder
-#define GPIO_TFT_RESET_PIN 6 // physical 22 // overrides IR sensor, which is at 11 for us
-#define GPIO_TFT_POWER 27 // physical 36 // was 38
+#define GPIO_TFT_DATA_CONTROL 18 // overrides rotary encoder
+#define GPIO_TFT_RESET_PIN 22 // overrides IR sensor, which is at 11 for us
+#define GPIO_TFT_POWER 36 // was 38
 
 int handle;
 static struct spi_ioc_transfer xfer;
@@ -84,7 +84,7 @@ void spiTransfer(char cmd, int num_args, ...) {
 void initDisplay() {
     memset(iPinHandles, -1, sizeof(iPinHandles));
 
-    wiringPiSetupGpio();
+    wiringPiSetupPinType(WPI_PIN_PHYS);
 
     pinMode(GPIO_TFT_DATA_CONTROL, OUTPUT);
     pinMode(GPIO_TFT_RESET_PIN, OUTPUT);
