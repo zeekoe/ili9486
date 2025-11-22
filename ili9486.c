@@ -100,7 +100,7 @@ void initDisplay() {
     digitalWrite(GPIO_TFT_RESET_PIN, 1);
     usleep(5 * 1000);
 
-    handle = initSpi(2, 15000000);
+    handle = initSpi(0, 15000000);
 
     digitalWrite(GPIO_SPI0_CE0, 0);
     usleep(10);
