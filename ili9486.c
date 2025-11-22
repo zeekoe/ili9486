@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <linux/types.h>
 #include <errno.h>
+#include <wiringPi.h>
 
 #define GPIO_OUT 0
 #define GPIO_IN 1
@@ -33,25 +34,20 @@ static int iPinHandles[MAX_PINS];
 #define GPIO_SPI0_CE1    7        // Pin P1-26, CE1 when SPI0 in use (touch panel)
  */
 
-#define GPIO_SPI0_MOSI 19
-#define GPIO_SPI0_CLK 23
-#define GPIO_SPI0_CE0 24
+#define GPIO_SPI0_MOSI 12 // physical 19
+#define GPIO_SPI0_CLK 14 // physical 23
+#define GPIO_SPI0_CE0 10 // physical 24
 
-#define GPIO_TFT_DATA_CONTROL 18 // overrides rotary encoder
-#define GPIO_TFT_RESET_PIN 22 // overrides IR sensor, which is at 11 for us
-#define GPIO_TFT_POWER 36 // was 38
-
-#define BEGIN_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 0);
-#define END_SPI_COMMUNICATION AIOWriteGPIO(GPIO_SPI0_CE0, 1);
+#define GPIO_TFT_DATA_CONTROL 5 // physical 18 // overrides rotary encoder
+#define GPIO_TFT_RESET_PIN 6 // physical 22 // overrides IR sensor, which is at 11 for us
+#define GPIO_TFT_POWER 27 // physical 36 // was 38
 
 int handle;
 static struct spi_ioc_transfer xfer;
 
 void drawRow(int y, const unsigned short *dataBufPtr);
-int AIOOpenSPI(int iChannel, int iSPIFreq);
-int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen);
-int AIOWriteGPIO(int iPin, int iValue);
-int AIOAddGPIO(int iPin, int iDirection);
+int initSpi(int iChannel, int iSPIFreq);
+int writeSpi(int iHandle, unsigned char *pBuf, int iLen);
 void drawRowRaw(int y, const unsigned short *dataBufPtr);
 void swapEndianness(const unsigned short *dataBufPtr);
 
@@ -64,12 +60,12 @@ void spiTransfer(char cmd, int num_args, ...) {
     *str++ = 0;
     *str++ = cmd;
 
-    AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
+    digitalWrite(GPIO_TFT_DATA_CONTROL, 0);
 
 //    printspi(origStr, 2, 1);
-    AIOWriteSPI(handle, origStr, 2);
+    writeSpi(handle, origStr, 2);
 
-    AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
+    digitalWrite(GPIO_TFT_DATA_CONTROL, 1);
 
     str = origStr;
 
@@ -81,30 +77,32 @@ void spiTransfer(char cmd, int num_args, ...) {
     }
     va_end(ap);
 
-    AIOWriteSPI(handle, origStr, num_args);
+    writeSpi(handle, origStr, num_args);
 
 }
 
 void initDisplay() {
     memset(iPinHandles, -1, sizeof(iPinHandles));
 
-    AIOAddGPIO(GPIO_TFT_DATA_CONTROL, GPIO_OUT);
-    AIOAddGPIO(GPIO_TFT_RESET_PIN, GPIO_OUT);
-    AIOAddGPIO(GPIO_TFT_POWER, GPIO_OUT);
+    wiringPiSetupGpio();
 
-    AIOWriteGPIO(GPIO_TFT_POWER, 0);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
+    pinMode(GPIO_TFT_DATA_CONTROL, OUTPUT);
+    pinMode(GPIO_TFT_RESET_PIN, OUTPUT);
+    pinMode(GPIO_TFT_POWER, OUTPUT);
+
+    digitalWrite(GPIO_TFT_POWER, 0);
+    digitalWrite(GPIO_TFT_RESET_PIN, 1);
     usleep(5 * 1000);
 
     usleep(100);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 0);
+    digitalWrite(GPIO_TFT_RESET_PIN, 0);
     usleep(100);
-    AIOWriteGPIO(GPIO_TFT_RESET_PIN, 1);
+    digitalWrite(GPIO_TFT_RESET_PIN, 1);
     usleep(5 * 1000);
 
-    handle = AIOOpenSPI(2, 15000000);
+    handle = initSpi(2, 15000000);
 
-    BEGIN_SPI_COMMUNICATION;
+    digitalWrite(GPIO_SPI0_CE0, 0);
     usleep(10);
     {
         spiTransfer(0xB0/*Interface Mode Control*/, 2, 0x00,
@@ -151,11 +149,11 @@ void initDisplay() {
         spiTransfer(0x38/*Idle Mode OFF*/, 0);
         spiTransfer(0x13/*Normal Display Mode ON*/, 0);
     }
-    END_SPI_COMMUNICATION;
+    digitalWrite(GPIO_SPI0_CE0, 1);
 }
 
 void deInitDisplay() {
-    AIOWriteGPIO(GPIO_TFT_POWER, 1);
+    digitalWrite(GPIO_TFT_POWER, 1);
 }
 
 void drawRow(int y, const unsigned short *dataBufPtr) {
@@ -182,9 +180,9 @@ void drawRowRaw(int y, const unsigned short *dataBufPtr) {
 
     unsigned char cmdBuf[2] = {0, DISPLAY_WRITE_PIXELS};
 
-    AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 0);
-    AIOWriteSPI(handle, cmdBuf, 2);
-    AIOWriteGPIO(GPIO_TFT_DATA_CONTROL, 1);
+    digitalWrite(GPIO_TFT_DATA_CONTROL, 0);
+    writeSpi(handle, cmdBuf, 2);
+    digitalWrite(GPIO_TFT_DATA_CONTROL, 1);
 
     xfer.rx_buf = 0;
     xfer.tx_buf = (unsigned long) dataBufPtr;
@@ -193,13 +191,7 @@ void drawRowRaw(int y, const unsigned short *dataBufPtr) {
     ioctl(handle, SPI_IOC_MESSAGE(1), &xfer);
 }
 
-static int iRPIPins[] = {-1,-1,-1,2,-1,3,-1,4,14,-1,
-                         15,17,18,27,-1,22,23,-1,24,10,
-                         -1,9,25,11,8,-1,7,0,1,5,
-                         -1,6,12,13,-1,19,16,26,20,-1,
-                         21};
-
-int AIOOpenSPI(int iChannel, int iSPIFreq)
+int initSpi(int iChannel, int iSPIFreq)
 {
     int rc, iSPIMode = SPI_MODE_0; // | SPI_NO_CS;
     char szName[32];
@@ -224,11 +216,9 @@ int AIOOpenSPI(int iChannel, int iSPIFreq)
         return -1;
     }
     return file_spi;
-} /* AIOOpenSPI() */
+}
 
-
-
-int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen)
+int writeSpi(int iHandle, unsigned char *pBuf, int iLen)
 {
     int rc;
     xfer.rx_buf = 0;
@@ -236,65 +226,4 @@ int AIOWriteSPI(int iHandle, unsigned char *pBuf, int iLen)
     xfer.len = iLen;
     rc = ioctl(iHandle, SPI_IOC_MESSAGE(1), &xfer);
     return rc;
-} /* AIOWriteSPI() */
-
-
-//
-// Write a 0 or 1 to a GPIO output line
-//
-int AIOWriteGPIO(int iPin, int iValue)
-{
-    int rc, iGPIO;
-    char szTemp[64];
-    int *pPins;
-
-    if (iPinHandles[iPin] == -1) // not open yet
-    {
-        pPins = iRPIPins;
-        iGPIO = pPins[iPin]; // convert to GPIO number
-        sprintf(szTemp, "/sys/class/gpio/gpio%d/value", iGPIO);
-        iPinHandles[iPin] = open(szTemp, O_WRONLY);
-    }
-    if (iValue) rc = write(iPinHandles[iPin], "1", 1);
-    else rc = write(iPinHandles[iPin], "0", 1);
-    if (rc < 0) // error
-    { // do something
-    }
-    return 1;
-} /* AIOWriteGPIO() */
-
-int AIOAddGPIO(int iPin, int iDirection)
-{
-    char szName[64];
-    int file_gpio, rc, iGPIO;
-    int *pPins;
-
-    pPins = iRPIPins;
-
-    file_gpio = open("/sys/class/gpio/export", O_WRONLY);
-    if (file_gpio < 1) {
-        fprintf(stderr, "Error opening /sys/class/gpio/export = %d\n", errno);
-        return 0;
-    }
-    iGPIO = pPins[iPin];
-    sprintf(szName, "%d", iGPIO);
-    rc = write(file_gpio, szName, strlen(szName));
-    close(file_gpio);
-    usleep(200000); // allow time for udev to make the needed changes
-    sprintf(szName, "/sys/class/gpio/gpio%d/direction", iGPIO);
-    file_gpio = open(szName, O_WRONLY);
-    if (file_gpio < 1) {
-        fprintf(stderr, "error setting direction on GPIO pin %d\n", iGPIO);
-        return 0;
-    }
-    if (iDirection == GPIO_OUT)
-        rc = write(file_gpio, "out\n", 4);
-    else
-        rc = write(file_gpio, "in\n", 3);
-    close(file_gpio);
-    if (rc < 0)
-    {
-        fprintf(stderr, "Error setting mode on GPIO pin %d\n", iGPIO);
-    }
-    return 1;
-} /* AIOAddGPIO() */
+}
