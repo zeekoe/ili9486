@@ -368,10 +368,10 @@ int main() {
     //displaySend(SEND_CMD, 0xA4); // Entire Display OFF, all pixels turns OFF in GS level 0
     //displaySend(SEND_CMD, 0xA5); // Entire Display ON, all pixels turns ON in GS level 15
     ClearDisplay();
-    delay(1000);
+    usleep(1000 * 1000);
     CheckerboardOdd();
-    delay(4000);
+    usleep(4000 * 1000);
     CheckerboardEven();
-    delay(1000);
+    usleep(1000 * 1000);
     FillDisplay();
 }
