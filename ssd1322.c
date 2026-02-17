@@ -34,8 +34,6 @@ static int iPinHandles[MAX_PINS];
 #define MAXROWS      64
 #define MAXCOLS     240 // 256?
 
-int SIG_MODE = MODE_SPI4W;
-
 int handle;
 static struct spi_ioc_transfer xfer;
 
@@ -47,6 +45,8 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
     // todo
 }
 
+void displaySend(unsigned char sendType, unsigned char v);
+
 void spiTransfer(char cmd, int num_args, ...) {
     va_list ap;
 
@@ -56,12 +56,12 @@ void spiTransfer(char cmd, int num_args, ...) {
     *str++ = 0;
     *str++ = cmd;
 
-    digitalWrite(GPIO_TFT_DATA_CONTROL, 0);
+//    digitalWrite(GPIO_TFT_DATA_CONTROL, 0);
 
 //    printspi(origStr, 2, 1);
     writeSpi(handle, origStr, 2);
 
-    digitalWrite(GPIO_TFT_DATA_CONTROL, 1);
+//    digitalWrite(GPIO_TFT_DATA_CONTROL, 1);
 
     str = origStr;
 
@@ -172,7 +172,7 @@ void deInitDisplay() {
 //--------------------------------------------------------------------------
 //##########################################################################
 //--------------------------------------------------------------------------
-void displaySend(uint8_t sendType, unsigned char v)
+void displaySend(unsigned char sendType, unsigned char v)
 {
   unsigned char i;
 
