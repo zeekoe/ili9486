@@ -41,9 +41,6 @@ void drawRow(int y, const unsigned short *dataBufPtr);
 int initSpi(int iChannel, int iSPIFreq);
 int writeSpi(int iHandle, unsigned char *pBuf, int iLen);
 
-void drawRow(int y, const unsigned short *dataBufPtr) {
-    // todo
-}
 
 void displaySend(unsigned char sendType, unsigned char v);
 
@@ -293,22 +290,30 @@ void CheckerboardOdd()
   unsigned int i, j;
 
   Set_Column_Address(0x00,0x77);
-  Set_Row_Address(0x00,0x7F);
+  Set_Row_Address(0x1,0x7F);
   Set_Write_RAM();
 
-  for(i=0;i<MAXROWS;i++)
+  for(i=0;i<256;i++)
   {
-    for(j=0;j<MAXCOLS/2;j++)
-    {
-      displaySend(SEND_DAT, 0x0F);
-      displaySend(SEND_DAT, 0x0F);
-    }
-    for(j=0;j<MAXCOLS/2;j++)
-    {
-      displaySend(SEND_DAT, j % 256);
-      displaySend(SEND_DAT, j % 256);
-    }
+      displaySend(SEND_DAT, 0xFF);
   }
+  Set_Column_Address(0x00,0x77);
+  Set_Row_Address(0x0,0x7F);
+  Set_Write_RAM();
+
+  for(i=0;i<256;i++)
+  {
+      displaySend(SEND_DAT, 0x0F);
+  }
+    unsigned short dataBuffer[256];
+    for (int i = 0; i < 256; i++) {
+        dataBuffer[i] = 0x0F;
+    }
+
+    // Call drawRow with the y-coordinate and the data buffer
+    drawRow(5, dataBuffer); // Here, 5 is the y-coordinate (for example)
+    drawRow(6, dataBuffer); // Here, 5 is the y-coordinate (for example)
+
 }
 
 //--------------------------------------------------------------------------
@@ -382,6 +387,16 @@ int writeSpi(int iHandle, unsigned char *pBuf, int iLen)
     return rc;
 }
 
+void drawRow(int y, const unsigned short *dataBufPtr) {
+  Set_Column_Address(0x00,0x77);
+  Set_Row_Address(y,0x7F);
+  Set_Write_RAM();
+
+  for(int i=0;i<256;i++)
+  {
+      displaySend(SEND_DAT, *dataBufPtr++);
+  }
+}
 
 int main() {
 do {

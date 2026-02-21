@@ -11,8 +11,8 @@ import java.net.URL;
 import java.util.Arrays;
 
 public class Img {
-    public static final int WIDTH = 480;
-    public static final int HEIGHT = 320;
+    public static final int WIDTH = 92;
+    public static final int HEIGHT = 64;
     private final BufferedImage buffer = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_USHORT_565_RGB);
     private final Graphics2D g2d = buffer.createGraphics();
 
@@ -24,7 +24,7 @@ public class Img {
         g2d.clearRect(0, 0, WIDTH, HEIGHT);
 
 
-        final URL resource = Img.class.getClassLoader().getResource("colour.png");
+        final URL resource = Img.class.getClassLoader().getResource("radio.png");
         try {
             final BufferedImage image = ImageIO.read(resource);
             g2d.drawImage(image, null, 0,0);

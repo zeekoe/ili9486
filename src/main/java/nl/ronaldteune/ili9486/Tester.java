@@ -7,7 +7,7 @@ public class Tester {
         System.setProperty("jna.debug_load", "false");
         System.setProperty("jna.debug_load.jna", "false");
 
-        final Ili9486 ili9486 = Native.load("/usr/local/lib/ssd1322.so", Ssd1322.class);
+        final var ili9486 = Native.load("/usr/local/lib/ssd1322.so", Ssd1322.class);
         ili9486.initDisplay();
 
         try {
