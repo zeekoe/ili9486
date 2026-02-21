@@ -85,6 +85,8 @@ void initDisplay() {
     pinMode(GPIO_TFT_DATA_CONTROL, OUTPUT);
     pinMode(GPIO_TFT_RESET_PIN, OUTPUT);
     pinMode(GPIO_TFT_POWER, OUTPUT);
+	pinMode(GPIO_SPI0_MOSI, OUTPUT);
+	pinMode(GPIO_SPI0_CLK, OUTPUT);
 
     digitalWrite(GPIO_TFT_POWER, 0);
     digitalWrite(GPIO_TFT_RESET_PIN, 1);
@@ -96,7 +98,7 @@ void initDisplay() {
     digitalWrite(GPIO_TFT_RESET_PIN, 1);
     usleep(5 * 1000);
 
-    handle = initSpi(0, 1500000);
+//    handle = initSpi(0, 1500000);
 
     digitalWrite(GPIO_SPI0_CE0, 0);
     usleep(10);
@@ -186,10 +188,28 @@ void displaySend(unsigned char sendType, unsigned char v)
   { // Send a data value
     digitalWrite(GPIO_TFT_DATA_CONTROL, HIGH);
   }
+//	usleep(10);
 
-  spiTransfer(v, 0);
+ // spiTransfer(v, 0);
+    for(i=8;i>0;i--)
+    { // Decrementing is faster
+      if((v&0x80)>>7==1)
+      {
+        digitalWrite(GPIO_SPI0_MOSI, HIGH);
+      }
+      else
+      {
+        digitalWrite(GPIO_SPI0_MOSI, LOW);
+      }
+      v=v<<1;
+      digitalWrite(GPIO_SPI0_CLK, LOW);
+//	usleep(1);
+      digitalWrite(GPIO_SPI0_CLK, HIGH);
+//usleep(1);
+    }
 
   digitalWrite(GPIO_SPI0_CE0, HIGH);
+//	usleep(100);
 }
 
 //--------------------------------------------------------------------------
@@ -364,14 +384,21 @@ int writeSpi(int iHandle, unsigned char *pBuf, int iLen)
 
 
 int main() {
+do {
+	printf("eerste");
+	usleep(1000);
     initDisplay();
+	printf("tweede\n");
     //displaySend(SEND_CMD, 0xA4); // Entire Display OFF, all pixels turns OFF in GS level 0
     //displaySend(SEND_CMD, 0xA5); // Entire Display ON, all pixels turns ON in GS level 15
     ClearDisplay();
     usleep(1000 * 1000);
+printf("derde\n");
     CheckerboardOdd();
-    usleep(4000 * 1000);
+    usleep(1000 * 1000);
+printf("vierde\n");
     CheckerboardEven();
     usleep(1000 * 1000);
     FillDisplay();
+} while(1);
 }
