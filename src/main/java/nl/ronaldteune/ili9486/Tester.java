@@ -7,13 +7,13 @@ public class Tester {
         System.setProperty("jna.debug_load", "false");
         System.setProperty("jna.debug_load.jna", "false");
 
-        final Ili9486 ili9486 = Native.load("/usr/local/lib/ili9486.so", Ili9486.class);
+        final Ili9486 ili9486 = Native.load("/usr/local/lib/ssd1322.so", Ssd1322.class);
         ili9486.initDisplay();
 
         try {
             while (true) {
                 final Img img = new Img();
-                for (int i = 0; i < 320; i++) {
+                for (int i = 0; i < 64; i++) {
                     ili9486.drawRow(i, img.getRow(i));
                 }
 
