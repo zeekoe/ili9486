@@ -37,7 +37,7 @@ static int iPinHandles[MAX_PINS];
 int handle;
 static struct spi_ioc_transfer xfer;
 
-void drawRow(int y, const unsigned short *dataBufPtr);
+void drawRow(int y, const unsigned char *dataBufPtr);
 int initSpi(int iChannel, int iSPIFreq);
 int writeSpi(int iHandle, unsigned char *pBuf, int iLen);
 
@@ -305,9 +305,12 @@ void CheckerboardOdd()
   {
       displaySend(SEND_DAT, 0x0F);
   }
-    unsigned short dataBuffer[256];
-    for (int i = 0; i < 256; i++) {
-        dataBuffer[i] = 0x0F;
+    unsigned char dataBuffer[256];
+    for (int i = 0; i < 128; i++) {
+        dataBuffer[i] = 0xF0;
+    }
+    for (int i = 128; i < 256; i++) {
+        dataBuffer[i] = 0xFF;
     }
 
     // Call drawRow with the y-coordinate and the data buffer
@@ -387,7 +390,7 @@ int writeSpi(int iHandle, unsigned char *pBuf, int iLen)
     return rc;
 }
 
-void drawRow(int y, const unsigned short *dataBufPtr) {
+void drawRow(int y, const unsigned char *dataBufPtr) {
   Set_Column_Address(0x00,0x77);
   Set_Row_Address(y,0x7F);
   Set_Write_RAM();
@@ -399,21 +402,11 @@ void drawRow(int y, const unsigned short *dataBufPtr) {
 }
 
 int main() {
+initDisplay();
 do {
-	printf("eerste");
-	usleep(1000);
-    initDisplay();
-	printf("tweede\n");
-    //displaySend(SEND_CMD, 0xA4); // Entire Display OFF, all pixels turns OFF in GS level 0
-    //displaySend(SEND_CMD, 0xA5); // Entire Display ON, all pixels turns ON in GS level 15
     ClearDisplay();
     usleep(1000 * 1000);
-printf("derde\n");
     CheckerboardOdd();
     usleep(1000 * 1000);
-printf("vierde\n");
-    CheckerboardEven();
-    usleep(1000 * 1000);
-    FillDisplay();
 } while(1);
 }
