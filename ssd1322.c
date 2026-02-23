@@ -165,7 +165,7 @@ void initDisplay() {
 }
 
 void deInitDisplay() {
-    digitalWrite(GPIO_TFT_POWER, 1);
+	displaySend(SEND_CMD, 0xAE); // AE = off, AF = on
 }
 
 //--------------------------------------------------------------------------
@@ -213,8 +213,8 @@ void displaySend(unsigned char sendType, unsigned char v)
 void Set_Column_Address(unsigned char a, unsigned char b)
 {
   displaySend(SEND_CMD, 0x15); // Set Column Address
-  displaySend(SEND_DAT, a);    //   Default => 0x00
-  displaySend(SEND_DAT, b);    //   Default => 0x77
+  displaySend(SEND_DAT, a + 28);    //   Default => 0x00
+  displaySend(SEND_DAT, b + 28);    //   Default => 0x77
 }
 
 //--------------------------------------------------------------------------
@@ -405,8 +405,9 @@ int main() {
 initDisplay();
 do {
     ClearDisplay();
-    usleep(1000 * 1000);
     CheckerboardOdd();
     usleep(1000 * 1000);
+displaySend(SEND_CMD, 0xAE); // AE = off, AF = on
+usleep(20000 * 1000);
 } while(1);
 }
