@@ -213,8 +213,8 @@ void displaySend(unsigned char sendType, unsigned char v)
 void Set_Column_Address(unsigned char a, unsigned char b)
 {
   displaySend(SEND_CMD, 0x15); // Set Column Address
-  displaySend(SEND_DAT, a + 28);    //   Default => 0x00
-  displaySend(SEND_DAT, b + 28);    //   Default => 0x77
+  displaySend(SEND_DAT, 28);    //   Default => 0x00
+  displaySend(SEND_DAT, 28+127);    //   Default => 0x77
 }
 
 //--------------------------------------------------------------------------
